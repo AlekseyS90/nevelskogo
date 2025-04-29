@@ -73,19 +73,19 @@
     </div>
 
     <script>
-        let isSubmitted = false;
-
-        // Проверяем, что мы внутри Telegram Mini App
-        if (!window.Telegram || !window.Telegram.WebApp || !window.Telegram.WebApp.initData) {
+        // Гарантируем, что работаем только внутри Telegram Mini App
+        if (!window.Telegram || !window.Telegram.WebApp) {
             document.body.innerHTML = `
                 <div style="color: red; text-align: center; padding: 20px;">
                     <h2>⚠️ Ошибка</h2>
-                    <p>Форма должна открываться через Telegram.</p>
+                    <p>Форма должна запускаться через Telegram.</p>
                 </div>`;
             throw new Error("Mini App должен запускаться через Telegram");
         }
 
         const tg = window.Telegram.WebApp;
+        let isSubmitted = false;
+
         tg.expand();
 
         function validateForm() {
@@ -128,7 +128,7 @@
 
         function submitForm(type) {
             if (isSubmitted) {
-                console.log("Попытка повторной отправки");
+                alert("Заявка уже отправлена!");
                 return;
             }
 
@@ -143,27 +143,27 @@
                 type,
             };
 
-            console.log("Отправляемые данные:", JSON.stringify(formData));
+            // 👇 Эта строка выводит данные в консоль — важно для проверки
+            console.log("✅ Отправляемые данные:", JSON.stringify(formData));
 
             isSubmitted = true;
 
             try {
+                // 👇 Это команда, которая отправляет данные боту
                 tg.sendData(JSON.stringify(formData));
-                console.log("Данные успешно отправлены");
 
+                // 👇 Показываем, что всё прошло успешно
                 tg.showAlert("✅ Заявка отправлена!", () => {
                     setTimeout(() => {
-                        tg.close();
-                    }, 500);
+                        tg.close(); // закрываем окно через 2 секунды
+                    }, 2000);
                 });
             } catch (err) {
                 isSubmitted = false;
-                console.error("Ошибка при отправке данных:", err);
+                console.error("❌ Ошибка при отправке данных:", err);
                 tg.showAlert("❌ Ошибка отправки. Попробуйте ещё раз.");
             }
         }
-
-        window.onload = () => console.log("Mini App загружен");
     </script>
 </body>
 </html>

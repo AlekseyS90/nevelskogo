@@ -2,96 +2,79 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Drinx - Заявка</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Заявка DRINX</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f8f8f8;
+      background: #0f0f0f;
+      color: #fff;
       margin: 0;
       padding: 20px;
     }
     h1 {
       text-align: center;
-      color: #333;
     }
     .container {
-      max-width: 400px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      display: grid;
+      gap: 20px;
     }
-    input, select, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background-color: #7c3aed;
-      color: #fff;
+    .card {
+      background: linear-gradient(145deg, #1e1e1e, #2e2e2e);
       border: none;
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
       cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      transition: 0.3s ease;
     }
-    button:hover {
-      background-color: #6b21a8;
+    .card:hover {
+      transform: scale(1.03);
+    }
+    h2 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+    p {
+      margin: 0;
+      font-size: 14px;
+      color: #ccc;
     }
   </style>
 </head>
 <body>
+  <h1>Выберите тип заявки</h1>
   <div class="container">
-    <h1>Оформление заявки</h1>
-    <form id="orderForm">
-      <label for="name">Ваше имя:</label>
-      <input type="text" id="name" placeholder="Алексей" required />
-
-      <label for="phone">Телефон:</label>
-      <input type="tel" id="phone" placeholder="89998887766" required />
-
-      <label for="type">Выберите услугу:</label>
-      <select id="type" required>
-        <option value="">-- Выберите --</option>
-        <option value="СВОБОДНЫЕ РУКИ">СВОБОДНЫЕ РУКИ (доставка)</option>
-        <option value="ПЕРСОНАЛЬНЫЙ МЕНЕДЖЕР">ПЕРСОНАЛЬНЫЙ МЕНЕДЖЕР</option>
-      </select>
-
-      <button type="submit">Отправить заявку</button>
-    </form>
+    <button class="card" onclick="submit('Свободные руки')">
+      <h2>Свободные руки</h2>
+      <p>Заявка на замену/поддержку персонала</p>
+    </button>
+    <button class="card" onclick="submit('Дегустация')">
+      <h2>Дегустация</h2>
+      <p>Заявка на проведение дегустации</p>
+    </button>
+    <button class="card" onclick="submit('Мероприятие')">
+      <h2>Мероприятие</h2>
+      <p>Заявка на организацию события</p>
+    </button>
   </div>
 
   <script>
-    const form = document.getElementById("orderForm");
+    function submit(type) {
+      const name = prompt("Введите ваше имя:");
+      const phone = prompt("Введите ваш номер телефона:");
 
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      const name = document.getElementById("name").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-      const type = document.getElementById("type").value;
-
-      if (!name || !phone || !type) {
+      if (!name || !phone) {
         alert("Пожалуйста, заполните все поля.");
         return;
       }
 
-      const data = {
-        name: name,
-        phone: phone,
-        type: type
-      };
-
-      // Отправка данных в Telegram
-      if (window.Telegram.WebApp) {
-        Telegram.WebApp.sendData(JSON.stringify(data));
-        Telegram.WebApp.close(); // Закрывает WebApp после отправки
-      } else {
-        alert("Ошибка инициализации Telegram WebApp");
-      }
-    });
+      const data = { name, phone, type };
+      const json = JSON.stringify(data);
+      window.Telegram.WebApp.sendData(json);
+      window.Telegram.WebApp.close();
+    }
   </script>
 </body>
 </html>

@@ -59,18 +59,12 @@
 <body>
     <div class="container">
         <div class="form-group">
-            <input type="text" 
-                   id="name" 
-                   placeholder="Ваше имя"
-                   required>
+            <input type="text" id="name" placeholder="Ваше имя" required />
             <div id="name-error" class="error"></div>
         </div>
-        
+
         <div class="form-group">
-            <input type="tel" 
-                   id="phone" 
-                   placeholder="Телефон (пример: 79001234567)"
-                   required>
+            <input type="tel" id="phone" placeholder="Телефон (пример: 79001234567)" required />
             <div id="phone-error" class="error"></div>
         </div>
 
@@ -79,142 +73,97 @@
     </div>
 
     <script>
-        // Инициализация WebApp
-        const tg = window.Telegram.WebApp;
         let isSubmitted = false;
 
-        // Проверка окружения
-        if (!tg || !tg.initData) {
-            showFatalError('Mini App запущен вне Telegram!');
-        }
-
-        // Инициализация
-        tg.expand();
-        tg.MainButton
-            .setText('Отправить заявку')
-            .hide()
-            .onClick(handleMainButtonClick);
-
-        // Логирование
-        function log(message) {
-            console.log(`[${new Date().toISOString()}] ${message}`);
-        }
-
-        // Показать ошибку
-        function showError(elementId, message) {
-            const errorElement = document.getElementById(elementId);
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
-        }
-
-        // Скрыть ошибку
-        function hideError(elementId) {
-            document.getElementById(elementId).style.display = 'none';
-        }
-
-        // Фатальная ошибка
-        function showFatalError(message) {
+        // Проверяем, что мы внутри Telegram Mini App
+        if (!window.Telegram || !window.Telegram.WebApp || !window.Telegram.WebApp.initData) {
             document.body.innerHTML = `
-                <div style="color: #dc3545; text-align: center; padding: 20px;">
+                <div style="color: red; text-align: center; padding: 20px;">
                     <h2>⚠️ Ошибка</h2>
-                    <p>${message}</p>
-                </div>
-            `;
-            tg.MainButton.hide();
+                    <p>Форма должна открываться через Telegram.</p>
+                </div>`;
+            throw new Error("Mini App должен запускаться через Telegram");
         }
 
-        // Валидация формы
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
         function validateForm() {
-            const name = document.getElementById('name').value.trim();
-            const phone = document.getElementById('phone').value.trim();
+            const name = document.getElementById("name").value.trim();
+            const phone = document.getElementById("phone").value.trim();
             let isValid = true;
 
-            // Валидация имени
             if (!name) {
-                showError('name-error', 'Введите ваше имя');
+                showError("name-error", "Введите ваше имя");
                 isValid = false;
             } else {
-                hideError('name-error');
+                hideError("name-error");
             }
 
-            // Валидация телефона
             if (!phone) {
-                showError('phone-error', 'Введите телефон');
+                showError("phone-error", "Введите телефон");
                 isValid = false;
             } else if (!/^(\+7|8|7)?\d{10}$/.test(phone)) {
-                showError('phone-error', 'Неверный формат телефона');
+                showError("phone-error", "Неверный формат телефона");
                 isValid = false;
             } else {
-                hideError('phone-error');
+                hideError("phone-error");
             }
 
-            tg.MainButton[isValid ? 'show' : 'hide']();
             return isValid;
         }
 
-        // Обработчик основной кнопки
-        function handleMainButtonClick() {
-            submitForm('default');
+        function showError(id, msg) {
+            document.getElementById(id).textContent = msg;
+            document.getElementById(id).style.display = "block";
         }
 
-        // Отправка формы
+        function hideError(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        function normalizePhone(phone) {
+            return phone.replace(/^(\+7|8|7)/, "7").replace(/\D/g, "");
+        }
+
         function submitForm(type) {
             if (isSubmitted) {
-                log('Попытка повторной отправки формы');
+                console.log("Попытка повторной отправки");
                 return;
             }
 
             if (!validateForm()) {
-                tg.showAlert('Заполните все поля правильно!');
+                tg.showAlert("Заполните все поля правильно!");
                 return;
             }
 
             const formData = {
-                name: document.getElementById('name').value.trim(),
-                phone: normalizePhone(document.getElementById('phone').value.trim()),
-                type: type
+                name: document.getElementById("name").value.trim(),
+                phone: normalizePhone(document.getElementById("phone").value.trim()),
+                type,
             };
 
-            log(`Отправка данных: ${JSON.stringify(formData)}`);
-            
+            console.log("Отправляемые данные:", JSON.stringify(formData));
+
             isSubmitted = true;
-            tg.MainButton.showProgress();
-            
+
             try {
                 tg.sendData(JSON.stringify(formData));
-                log('Данные успешно отправлены');
-                
-                setTimeout(() => {
-                    tg.close();
-                    log('Mini App закрыт');
-                }, 300);
-            } catch (error) {
+                console.log("Данные успешно отправлены");
+
+                tg.showAlert("✅ Заявка отправлена!", () => {
+                    setTimeout(() => {
+                        tg.close();
+                    }, 500);
+                });
+            } catch (err) {
                 isSubmitted = false;
-                tg.MainButton.hideProgress();
-                log(`Ошибка отправки: ${error.message}`);
-                tg.showAlert('Ошибка отправки. Попробуйте ещё раз.');
+                console.error("Ошибка при отправке данных:", err);
+                tg.showAlert("❌ Ошибка отправки. Попробуйте ещё раз.");
             }
         }
 
-        // Нормализация номера телефона
-        function normalizePhone(phone) {
-            return phone.replace(/^(\+7|8|7)/, '7').replace(/\D/g, '');
-        }
-
-        // Слушатели событий
-        document.getElementById('name').addEventListener('input', () => {
-            hideError('name-error');
-            validateForm();
-        });
-
-        document.getElementById('phone').addEventListener('input', () => {
-            hideError('phone-error');
-            validateForm();
-        });
-
-        // Инициализация
-        tg.ready();
-        log('Mini App инициализирован');
+        window.onload = () => console.log("Mini App загружен");
     </script>
 </body>
 </html>

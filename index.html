@@ -21,7 +21,6 @@
     }
     .card {
       background: linear-gradient(145deg, #1e1e1e, #2e2e2e);
-      border: none;
       border-radius: 16px;
       padding: 20px;
       text-align: center;
@@ -44,6 +43,7 @@
   </style>
 </head>
 <body>
+  <!-- === Контент === -->
   <h1>Выберите тип заявки</h1>
   <div class="container">
     <button class="card" onclick="submit('Свободные руки')">
@@ -60,10 +60,24 @@
     </button>
   </div>
 
+  <!-- === Telegram Mini App библиотека === -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
+    // Проверяем, запущен ли сайт внутри Telegram
+    if (!window.Telegram || !window.Telegram.WebApp) {
+      document.body.innerHTML = `
+        <div style="color: red; text-align: center; padding: 40px;">
+          <h2>⚠️ Ошибка</h2>
+          <p>Эта страница должна открываться через Telegram.</p>
+        </div>
+      `;
+      throw new Error("Страница запущена вне Telegram Web App");
+    }
+
+    // Отправка данных
     function submit(type) {
       const name = prompt("Введите ваше имя:");
-      const phone = prompt("Введите ваш номер телефона:");
+      const phone = prompt("Введите номер телефона:");
 
       if (!name || !phone) {
         alert("Пожалуйста, заполните все поля.");
@@ -71,9 +85,18 @@
       }
 
       const data = { name, phone, type };
-      const json = JSON.stringify(data);
-      window.Telegram.WebApp.sendData(json);
-      window.Telegram.WebApp.close();
+
+      console.log("📤 Отправляем данные:", data);
+
+      // Отправляем данные боту
+      try {
+        window.Telegram.WebApp.sendData(JSON.stringify(data));
+        window.Telegram.WebApp.showAlert("✅ Заявка отправлена!");
+        setTimeout(() => window.Telegram.WebApp.close(), 2000);  // Закрываем окно
+      } catch (error) {
+        console.error("❌ Ошибка отправки данных:", error);
+        window.Telegram.WebApp.showAlert("⚠️ Не удалось отправить заявку. Попробуйте ещё раз.");
+      }
     }
   </script>
 </body>

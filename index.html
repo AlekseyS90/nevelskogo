@@ -1,103 +1,83 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Заявка DRINX</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f0f0f;
-      color: #fff;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-    }
-    .container {
-      display: grid;
-      gap: 20px;
-    }
-    .card {
-      background: linear-gradient(145deg, #1e1e1e, #2e2e2e);
-      border-radius: 16px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-      transition: 0.3s ease;
-    }
-    .card:hover {
-      transform: scale(1.03);
-    }
-    h2 {
-      margin: 0 0 10px;
-      font-size: 20px;
-    }
-    p {
-      margin: 0;
-      font-size: 14px;
-      color: #ccc;
-    }
-  </style>
+    <title>DRINX — Оставить заявку</title>
+    <meta charset="UTF-8">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 40px;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 12px;
+            width: 100%;
+            max-width: 300px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-  <!-- === Контент === -->
-  <h1>Выберите тип заявки</h1>
-  <div class="container">
-    <button class="card" onclick="submit('Свободные руки')">
-      <h2>Свободные руки</h2>
-      <p>Заявка на замену/поддержку персонала</p>
-    </button>
-    <button class="card" onclick="submit('Дегустация')">
-      <h2>Дегустация</h2>
-      <p>Заявка на проведение дегустации</p>
-    </button>
-    <button class="card" onclick="submit('Мероприятие')">
-      <h2>Мероприятие</h2>
-      <p>Заявка на организацию события</p>
-    </button>
-  </div>
+    <h1>Заявка DRINX</h1>
+    <p>Заполните имя и телефон:</p>
 
-  <!-- === Telegram Mini App библиотека === -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script>
-    // Проверяем, запущен ли сайт внутри Telegram
-    if (!window.Telegram || !window.Telegram.WebApp) {
-      document.body.innerHTML = `
-        <div style="color: red; text-align: center; padding: 40px;">
-          <h2>⚠️ Ошибка</h2>
-          <p>Эта страница должна открываться через Telegram.</p>
-        </div>
-      `;
-      throw new Error("Страница запущена вне Telegram Web App");
-    }
+    <input type="text" id="name" placeholder="Имя">
+    <input type="text" id="phone" placeholder="Телефон">
 
-    // Отправка данных
-    function submit(type) {
-      const name = prompt("Введите ваше имя:");
-      const phone = prompt("Введите номер телефона:");
+    <button onclick="submitForm()">Отправить заявку</button>
 
-      if (!name || !phone) {
-        alert("Пожалуйста, заполните все поля.");
-        return;
-      }
+    <div class="hidden" id="debug">Debug info</div>
 
-      const data = { name, phone, type };
+    <script>
+        // Проверяем, что мы внутри Telegram Mini App
+        if (!window.Telegram || !window.Telegram.WebApp) {
+            document.body.innerHTML = "<p style='color:red;'>⚠️ Страница должна открываться через Telegram</p>";
+            throw new Error("Mini App не загружен");
+        }
 
-      console.log("📤 Отправляем данные:", data);
+        const tg = window.Telegram.WebApp;
+        tg.expand();  // Расширяем окно
 
-      // Отправляем данные боту
-      try {
-        window.Telegram.WebApp.sendData(JSON.stringify(data));
-        window.Telegram.WebApp.showAlert("✅ Заявка отправлена!");
-        setTimeout(() => window.Telegram.WebApp.close(), 2000);  // Закрываем окно
-      } catch (error) {
-        console.error("❌ Ошибка отправки данных:", error);
-        window.Telegram.WebApp.showAlert("⚠️ Не удалось отправить заявку. Попробуйте ещё раз.");
-      }
-    }
-  </script>
+        function submitForm() {
+            const name = document.getElementById("name").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+
+            if (!name || !phone) {
+                alert("Пожалуйста, заполните все поля");
+                return;
+            }
+
+            const data = {
+                name: name,
+                phone: phone,
+                type: "test"
+            };
+
+            console.log("📤 Отправляемые данные:", JSON.stringify(data));
+
+            try {
+                tg.sendData(JSON.stringify(data));
+                document.getElementById("debug").textContent = "✅ Заявка отправлена";
+                document.getElementById("debug").classList.remove("hidden");
+
+                setTimeout(() => {
+                    tg.showAlert("Ваша заявка отправлена!");
+                    tg.close();
+                }, 1000);
+            } catch (error) {
+                console.error("❌ Ошибка при отправке:", error.message);
+                tg.showAlert("⚠️ Не удалось отправить данные. Попробуйте позже.");
+            }
+        }
+    </script>
 </body>
 </html>

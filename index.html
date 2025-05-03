@@ -1,149 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>DRINX - Выбор услуги</title>
+    <title>DRINX</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f8f5f0;
-            margin: 0;
-            padding: 20px;
-            color: #333;
-        }
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .logo img {
-            max-width: 150px;
-        }
-        .service-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-        .free-hands {
-            background-color: #8b0000;
-            color: white;
-        }
-        .manager {
-            background-color: #4a2511;
-            color: white;
-        }
-        .tasting {
-            background-color: #5c3a21;
-            color: white;
-        }
-        .service-btn:hover {
-            opacity: 0.9;
-            transform: scale(1.02);
-        }
-        .form-group {
-            margin: 20px 0;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        .submit-btn {
-            background-color: #5c3a21;
-            color: white;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            width: 100%;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-        }
+        body { font-family: Arial; padding: 20px; }
+        input, button { width: 100%; padding: 10px; margin: 5px 0; }
+        button { background: #8B0000; color: white; border: none; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">
-            <h2>DRINX</h2>
-            <p>BИHOTEKA</p>
-        </div>
-
-        <h3>Выберите услугу:</h3>
-        
-        <button class="service-btn free-hands" onclick="selectService('free_hands')">
-            СВОБОДНЫЕ РУКИ
-        </button>
-        
-        <button class="service-btn manager" onclick="selectService('manager')">
-            ПЕРСОНАЛЬНЫЙ МЕНЕДЖЕР
-        </button>
-        
-        <button class="service-btn tasting" onclick="selectService('tasting')">
-            ИНДИВИДУАЛЬНАЯ ДЕГУСТАЦИЯ
-        </button>
-
-        <div class="form-group">
-            <input type="text" id="name" placeholder="Ваше имя" required>
-        </div>
-        
-        <div class="form-group">
-            <input type="tel" id="phone" placeholder="Ваш телефон" required>
-        </div>
-
-        <button class="submit-btn" onclick="submitForm()">Отправить заявку</button>
-
-        <div class="logo" style="margin-top: 40px;">
-            <img src="[URL_ЛОГОТИПА_DRINX]" alt="DRINX Logo">
-        </div>
-    </div>
+    <input type="text" id="name" placeholder="Ваше имя">
+    <input type="tel" id="phone" placeholder="Телефон">
+    <button onclick="sendData()">Отправить</button>
 
     <script>
-        let selectedService = null;
-        
-        function selectService(serviceType) {
-            selectedService = serviceType;
-            // Снимаем выделение со всех кнопок
-            document.querySelectorAll('.service-btn').forEach(btn => {
-                btn.style.boxShadow = 'none';
-            });
-            // Выделяем выбранную кнопку
-            event.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 0, 0, 0.5)';
-        }
-        
-        function submitForm() {
-            const name = document.getElementById('name').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            
-            if (!name || !phone || !selectedService) {
-                Telegram.WebApp.showAlert('Заполните все поля и выберите услугу!');
-                return;
-            }
-            
+        function sendData() {
             const data = {
-                name: name,
-                phone: phone,
-                service_type: selectedService
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value
             };
-            
             Telegram.WebApp.sendData(JSON.stringify(data));
             Telegram.WebApp.close();
         }
-        
         Telegram.WebApp.ready();
     </script>
 </body>

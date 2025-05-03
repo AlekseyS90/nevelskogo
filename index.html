@@ -2,58 +2,32 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>DRINX - Заявка</title>
+    <title>DRINX</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            max-width: 500px;
-            margin: 0 auto;
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button, input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 8px 0; 
+            border-radius: 8px; 
         }
-        .service-btn {
-            background: #8b0000;
-            color: white;
-            padding: 12px;
-            margin: 8px 0;
-            border: none;
-            border-radius: 8px;
-            width: 100%;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-        #submit-btn {
-            background: #5c3a21;
-            color: white;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            width: 100%;
-            margin-top: 20px;
-        }
+        button { background: #8b0000; color: white; border: none; }
     </style>
 </head>
 <body>
     <h2>DRINX</h2>
-    <h3>ВИНОТЕКА</h3>
+    <h3>Выберите услугу:</h3>
     
-    <h4>Выберите услугу:</h4>
-    <button class="service-btn" onclick="selectService('free_hands')">СВОБОДНЫЕ РУКИ</button>
-    <button class="service-btn" onclick="selectService('manager')">ПЕРСОНАЛЬНЫЙ МЕНЕДЖЕР</button>
-    <button class="service-btn" onclick="selectService('tasting')">ИНДИВИДУАЛЬНАЯ ДЕГУСТАЦИЯ</button>
+    <button onclick="selectService('free_hands')">СВОБОДНЫЕ РУКИ</button>
+    <button onclick="selectService('manager')">МЕНЕДЖЕР</button>
+    <button onclick="selectService('tasting')">ДЕГУСТАЦИЯ</button>
 
     <input type="text" id="name" placeholder="Ваше имя" required>
-    <input type="tel" id="phone" placeholder="Ваш телефон" required>
-
-    <button id="submit-btn" onclick="submitForm()">Отправить заявку</button>
+    <input type="tel" id="phone" placeholder="Телефон" required>
+    <button onclick="submitForm()">ОТПРАВИТЬ</button>
 
     <script>
-        // Инициализация WebApp
         Telegram.WebApp.ready();
         Telegram.WebApp.expand();
         
@@ -61,10 +35,7 @@
         
         function selectService(service) {
             selectedService = service;
-            document.querySelectorAll('.service-btn').forEach(btn => {
-                btn.style.backgroundColor = '#8b0000';
-            });
-            event.target.style.backgroundColor = '#6b0000';
+            console.log("Selected service:", service);
         }
         
         function submitForm() {
@@ -72,12 +43,12 @@
             const phone = document.getElementById('phone').value.trim();
             
             if (!name || !phone) {
-                Telegram.WebApp.showAlert('Заполните все поля!');
+                Telegram.WebApp.showAlert("Заполните все поля!");
                 return;
             }
             
             if (!selectedService) {
-                Telegram.WebApp.showAlert('Выберите услугу!');
+                Telegram.WebApp.showAlert("Выберите услугу!");
                 return;
             }
             
@@ -87,7 +58,7 @@
                 service_type: selectedService
             };
             
-            console.log("Отправка данных:", data); // Для отладки
+            console.log("Sending data:", data);
             Telegram.WebApp.sendData(JSON.stringify(data));
             Telegram.WebApp.close();
         }

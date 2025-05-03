@@ -3,20 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DRINX - Винотека</title>
+    <title>DRINX</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f8f5f0;
             padding: 20px;
             max-width: 500px;
             margin: 0 auto;
-        }
-        h2 {
-            color: #5c3a21;
-            text-align: center;
-            margin-bottom: 30px;
+            background-color: #f8f5f0;
         }
         .service-btn {
             display: block;
@@ -25,48 +20,37 @@
             margin: 10px 0;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
             font-weight: bold;
+            color: white;
             cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
         }
-        .free-hands { background-color: #8b0000; color: white; }
-        .manager { background-color: #4a2511; color: white; }
-        .tasting { background-color: #5c3a21; color: white; }
-        .service-btn.active {
+        .free-hands { background-color: #8b0000; }
+        .manager { background-color: #4a2511; }
+        .tasting { background-color: #5c3a21; }
+        .active {
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.3);
             transform: scale(1.02);
-            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.5);
         }
-        input {
+        input, button {
             width: 100%;
             padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
+            margin: 8px 0;
             border-radius: 8px;
-            font-size: 16px;
             box-sizing: border-box;
         }
-        #phone {
-            direction: ltr;
-            text-align: left;
+        input {
+            border: 1px solid #ddd;
         }
-        .submit-btn {
-            background-color: #5c3a21;
+        button.submit {
+            background: #5c3a21;
             color: white;
-            padding: 15px;
             border: none;
-            border-radius: 8px;
-            width: 100%;
-            font-size: 16px;
             font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h2>DRINX ВИНОТЕКА</h2>
+    <h2 style="text-align:center;">DRINX ВИНОТЕКА</h2>
     
     <h3>Выберите услугу:</h3>
     <button class="service-btn free-hands" onclick="selectService('free_hands', this)">СВОБОДНЫЕ РУКИ</button>
@@ -76,56 +60,41 @@
     <input type="text" id="name" placeholder="Ваше имя" required>
     <input type="tel" id="phone" placeholder="+7 (___) ___-__-__" required>
 
-    <button class="submit-btn" onclick="submitForm()">ОТПРАВИТЬ ЗАЯВКУ</button>
+    <button class="submit" onclick="submitForm()">ОТПРАВИТЬ ЗАЯВКУ</button>
 
     <script>
-        // Инициализация WebApp
+        // Инициализация
         Telegram.WebApp.ready();
         Telegram.WebApp.expand();
-        
-        console.log("WebApp initialized!"); // Добавлено логирование
+        console.log("WebApp initialized");
         
         let selectedService = null;
         
+        // Выбор услуги
         function selectService(service, button) {
-            // Убираем выделение со всех кнопок
             document.querySelectorAll('.service-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            
-            // Выделяем текущую кнопку
             button.classList.add('active');
             selectedService = service;
-            console.log("Выбрана услуга:", service); // Добавлено логирование
+            console.log("Selected service:", service);
         }
         
+        // Отправка формы
         function submitForm() {
             const name = document.getElementById('name').value.trim();
             let phone = document.getElementById('phone').value.replace(/\D/g, '');
             
-            // Нормализация номера телефона
+            // Нормализация телефона
             if (phone.startsWith('8') && phone.length === 11) {
-                phone = '+7' + phone.substring(1);
-            } else if (phone.startsWith('7') && phone.length === 11) {
-                phone = '+' + phone;
-            } else if (phone.length === 10) {
-                phone = '+7' + phone;
+                phone = '7' + phone.substring(1);
             }
+            phone = '+7' + phone.substring(1);
             
-            console.log("Проверка данных:", {name, phone, service: selectedService}); // Добавлено логирование
+            console.log("Form data:", {name, phone, service: selectedService});
             
-            if (!name) {
-                Telegram.WebApp.showAlert("Введите ваше имя!");
-                return;
-            }
-            
-            if (!phone || phone.length < 12) {
-                Telegram.WebApp.showAlert("Введите корректный номер телефона!");
-                return;
-            }
-            
-            if (!selectedService) {
-                Telegram.WebApp.showAlert("Выберите услугу!");
+            if (!name || !phone || !selectedService) {
+                Telegram.WebApp.showAlert("Заполните все поля!");
                 return;
             }
             
@@ -135,7 +104,7 @@
                 service_type: selectedService
             };
             
-            console.log("Отправка данных:", data); // Важное логирование!
+            console.log("Sending data:", data);
             Telegram.WebApp.sendData(JSON.stringify(data));
             Telegram.WebApp.close();
         }

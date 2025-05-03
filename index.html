@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DRINX - Выбор услуги</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -129,8 +131,13 @@
             const name = document.getElementById('name').value.trim();
             const phone = document.getElementById('phone').value.trim();
             
-            if (!name || !phone || !selectedService) {
-                Telegram.WebApp.showAlert('Заполните все поля и выберите услугу!');
+            if (!name || !phone) {
+                Telegram.WebApp.showAlert('Пожалуйста, заполните все поля!');
+                return;
+            }
+            
+            if (!selectedService) {
+                Telegram.WebApp.showAlert('Пожалуйста, выберите услугу!');
                 return;
             }
             
@@ -144,7 +151,11 @@
             Telegram.WebApp.close();
         }
         
-        Telegram.WebApp.ready();
+        // Инициализация WebApp
+        document.addEventListener('DOMContentLoaded', function() {
+            Telegram.WebApp.ready();
+            Telegram.WebApp.expand(); // Раскрываем WebApp на весь экран
+        });
     </script>
 </body>
 </html>

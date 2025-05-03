@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DRINX - Заявка</title>
+    <title>DRINX - Винотека</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -13,52 +13,63 @@
             max-width: 500px;
             margin: 0 auto;
         }
+        h2 {
+            color: #5c3a21;
+            text-align: center;
+            margin-bottom: 30px;
+        }
         .service-btn {
-            background: #8b0000;
-            color: white;
+            display: block;
+            width: 100%;
             padding: 15px;
             margin: 10px 0;
             border: none;
             border-radius: 8px;
-            width: 100%;
+            font-size: 16px;
             font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
         }
-        .manager { background: #4a2511; }
-        .tasting { background: #5c3a21; }
-        .active {
-            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.5);
+        .free-hands { background-color: #8b0000; color: white; }
+        .manager { background-color: #4a2511; color: white; }
+        .tasting { background-color: #5c3a21; color: white; }
+        .service-btn.active {
             transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.5);
         }
-        input, .submit-btn {
+        input {
             width: 100%;
             padding: 12px;
-            margin: 8px 0;
+            margin: 10px 0;
+            border: 1px solid #ddd;
             border-radius: 8px;
+            font-size: 16px;
             box-sizing: border-box;
         }
+        #phone {
+            direction: ltr;
+            text-align: left;
+        }
         .submit-btn {
-            background: #5c3a21;
+            background-color: #5c3a21;
             color: white;
+            padding: 15px;
             border: none;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 16px;
             font-weight: bold;
-        }
-        .logo {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .logo img {
-            max-width: 200px;
+            cursor: pointer;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="logo">
-        <img src="https://via.placeholder.com/200x80?text=DRINX+LOGO" alt="DRINX Logo">
-    </div>
-
-    <h3>Выберите услугу:</h3>
+    <h2>DRINX ВИНОТЕКА</h2>
     
-    <button class="service-btn" onclick="selectService('free_hands', this)">СВОБОДНЫЕ РУКИ</button>
+    <h3>Выберите услугу:</h3>
+    <button class="service-btn free-hands" onclick="selectService('free_hands', this)">СВОБОДНЫЕ РУКИ</button>
     <button class="service-btn manager" onclick="selectService('manager', this)">ПЕРСОНАЛЬНЫЙ МЕНЕДЖЕР</button>
     <button class="service-btn tasting" onclick="selectService('tasting', this)">ДЕГУСТАЦИЯ</button>
 
@@ -72,37 +83,49 @@
         Telegram.WebApp.ready();
         Telegram.WebApp.expand();
         
+        console.log("WebApp initialized!"); // Добавлено логирование
+        
         let selectedService = null;
-        let activeButton = null;
         
-        // Маска для телефона
-        document.getElementById('phone').addEventListener('input', function(e) {
-            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
-            e.target.value = !x[1] ? '' : '+7' + (x[2] ? ' (' + x[2] : '') + (x[3] ? ') ' + x[3] : '') + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
-        });
-        
-        // Выбор услуги
         function selectService(service, button) {
-            selectedService = service;
-            if (activeButton) activeButton.classList.remove('active');
+            // Убираем выделение со всех кнопок
+            document.querySelectorAll('.service-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Выделяем текущую кнопку
             button.classList.add('active');
-            activeButton = button;
+            selectedService = service;
+            console.log("Выбрана услуга:", service); // Добавлено логирование
         }
         
-        // Отправка формы
         function submitForm() {
             const name = document.getElementById('name').value.trim();
             let phone = document.getElementById('phone').value.replace(/\D/g, '');
             
-            // Нормализация телефона
+            // Нормализация номера телефона
             if (phone.startsWith('8') && phone.length === 11) {
                 phone = '+7' + phone.substring(1);
+            } else if (phone.startsWith('7') && phone.length === 11) {
+                phone = '+' + phone;
             } else if (phone.length === 10) {
                 phone = '+7' + phone;
             }
             
-            if (!name || !phone || !selectedService) {
-                Telegram.WebApp.showAlert("Заполните все поля и выберите услугу!");
+            console.log("Проверка данных:", {name, phone, service: selectedService}); // Добавлено логирование
+            
+            if (!name) {
+                Telegram.WebApp.showAlert("Введите ваше имя!");
+                return;
+            }
+            
+            if (!phone || phone.length < 12) {
+                Telegram.WebApp.showAlert("Введите корректный номер телефона!");
+                return;
+            }
+            
+            if (!selectedService) {
+                Telegram.WebApp.showAlert("Выберите услугу!");
                 return;
             }
             
@@ -112,7 +135,7 @@
                 service_type: selectedService
             };
             
-            console.log("Отправка данных:", data);
+            console.log("Отправка данных:", data); // Важное логирование!
             Telegram.WebApp.sendData(JSON.stringify(data));
             Telegram.WebApp.close();
         }

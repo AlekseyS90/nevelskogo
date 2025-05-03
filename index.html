@@ -6,7 +6,6 @@
     <title>DRINX - Винотека</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* Ваши стили остаются без изменений */
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f8f5f0;
@@ -26,24 +25,102 @@
             max-width: 150px;
             height: auto;
         }
-        /* ... остальные стили ... */
+        h2, h3 {
+            color: #5c3a21;
+            text-align: center;
+        }
+        .service-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .free-hands {
+            background-color: #8b0000;
+            color: white;
+        }
+        .manager {
+            background-color: #4a2511;
+            color: white;
+        }
+        .tasting {
+            background-color: #5c3a21;
+            color: white;
+        }
+        .service-btn.active {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.5);
+        }
+        .form-group {
+            margin: 20px 0;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        #phone {
+            direction: ltr;
+            text-align: left;
+        }
+        .submit-btn {
+            background-color: #5c3a21;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Ваша разметка остается без изменений -->
         <div class="logo">
-            <img src="logo.png" alt="DRINX Logo">
+            <img src="https://i.ibb.co/0jQ7ZzT/drinx-logo.png" alt="DRINX Logo">
             <h3>ВИНОТЕКА</h3>
         </div>
 
-        <!-- ... остальная разметка ... -->
+        <h3>Выберите услугу:</h3>
+        
+        <button class="service-btn free-hands" onclick="selectService('free_hands', this)">
+            СВОБОДНЫЕ РУКИ
+        </button>
+        
+        <button class="service-btn manager" onclick="selectService('manager', this)">
+            ПЕРСОНАЛЬНАЯ КОНСУЛЬТАЦИЯ
+        </button>
+        
+        <button class="service-btn tasting" onclick="selectService('tasting', this)">
+            ДЕГУСТАЦИЯ
+        </button>
 
+        <div class="form-group">
+            <input type="text" id="name" placeholder="Ваше имя" required>
+        </div>
+        
         <div class="form-group">
             <input type="tel" id="phone" placeholder="+7 (___) ___-__-__" required>
         </div>
 
-        <!-- ... остальная разметка ... -->
+        <button class="submit-btn" onclick="submitForm()">Отправить заявку</button>
     </div>
 
     <script>
@@ -51,67 +128,64 @@
         Telegram.WebApp.ready();
         Telegram.WebApp.expand();
         
-        // Маска для телефона с сохранением 8 после +7
+        let selectedService = null;
+        let selectedButton = null;
+        
+        // Маска для телефона с сохранением введенных цифр
         document.getElementById('phone').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
-            
-            // Сохраняем позицию курсора
             let cursorPos = e.target.selectionStart;
             
-            // Если начинается с 7 или 8, добавляем +7
-            if (value.length > 0 && (value[0] === '7' || value[0] === '8')) {
-                value = '7' + value.substring(1); // Меняем первую цифру на 7
-                value = '+7' + value.substring(1); // Добавляем +
-            } else if (value.length > 0) {
-                value = '+7' + value; // Просто добавляем +7
+            // Автоматически добавляем +7 если его нет
+            if (!value.startsWith('7') && !value.startsWith('8')) {
+                value = '7' + value;
             }
             
-            // Форматирование
-            let formatted = value;
-            if (value.length > 2) {
-                formatted = value.substring(0, 2) + ' ' + value.substring(2, 5);
+            // Форматирование номера
+            let formatted = '+7';
+            if (value.length > 1) {
+                formatted += ' (' + value.substring(1, 4);
             }
-            if (value.length > 5) {
-                formatted += ') ' + value.substring(5, 8);
+            if (value.length > 4) {
+                formatted += ') ' + value.substring(4, 7);
             }
-            if (value.length > 8) {
-                formatted += '-' + value.substring(8, 10);
+            if (value.length > 7) {
+                formatted += '-' + value.substring(7, 9);
             }
-            if (value.length > 10) {
-                formatted += '-' + value.substring(10, 12);
+            if (value.length > 9) {
+                formatted += '-' + value.substring(9, 11);
             }
             
             e.target.value = formatted;
             
-            // Восстанавливаем позицию курсора с учетом добавленных символов
-            let addedChars = formatted.length - value.length;
-            e.target.setSelectionRange(cursorPos + addedChars, cursorPos + addedChars);
+            // Корректируем позицию курсора
+            if (cursorPos === 1 && formatted.length > 1) {
+                cursorPos = 4; // Перемещаем курсор после +7 (
+            }
+            e.target.setSelectionRange(cursorPos, cursorPos);
         });
-        
-        // Остальной код (selectService, submitForm) остается без изменений
-        let selectedService = null;
-        let selectedButton = null;
         
         function selectService(serviceType, button) {
             selectedService = serviceType;
             
-            if (selectedButton) {
-                selectedButton.classList.remove('active');
-            }
+            // Снимаем выделение со всех кнопок
+            document.querySelectorAll('.service-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
             
+            // Выделяем выбранную кнопку
             button.classList.add('active');
-            selectedButton = button;
         }
         
         function submitForm() {
             const name = document.getElementById('name').value.trim();
             let phone = document.getElementById('phone').value.replace(/\D/g, '');
             
-            // Корректировка номера (если начинается с 8 меняем на +7)
-            if (phone.startsWith('8') && phone.length === 11) {
+            // Нормализация номера (сохраняем 8 если была введена)
+            if (phone.startsWith('7') && phone.length === 11) {
                 phone = '+7' + phone.substring(1);
-            } else if (phone.startsWith('7') && phone.length === 11) {
-                phone = '+' + phone;
+            } else if (phone.startsWith('8') && phone.length === 11) {
+                phone = '+7' + phone.substring(1);
             } else if (phone.length === 10) {
                 phone = '+7' + phone;
             }
@@ -122,7 +196,7 @@
                 return;
             }
             
-            if (!phone || phone.length < 12) { // +7 и 10 цифр
+            if (!phone || phone.length < 12) {
                 Telegram.WebApp.showAlert('Введите корректный номер телефона!');
                 document.getElementById('phone').focus();
                 return;
@@ -139,6 +213,7 @@
                 service_type: selectedService
             };
             
+            console.log("Отправка данных:", data);
             Telegram.WebApp.sendData(JSON.stringify(data));
             Telegram.WebApp.close();
         }

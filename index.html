@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f2f2f2;
+      background: #f6f6f6;
       display: flex;
       justify-content: center;
       padding: 20px;
@@ -16,55 +16,69 @@
     .container {
       background: #fff;
       border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
       padding: 30px;
       max-width: 400px;
       width: 100%;
     }
 
     img {
-      max-width: 100px;
+      max-width: 120px;
       margin: 0 auto 20px;
       display: block;
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
     }
 
     input {
       width: 100%;
       padding: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 15px;
       border: 1px solid #ccc;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 16px;
     }
 
     .buttons {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-bottom: 20px;
+      gap: 12px;
+      margin-bottom: 25px;
     }
 
     .buttons button {
       padding: 12px;
       font-size: 16px;
-      background: #800000;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
     }
 
+    .btn-blue { background: #007bff; }
+    .btn-maroon { background: #800000; }
+    .btn-green { background: #28a745; }
+
     .buttons button:hover {
-      background: #a00000;
+      opacity: 0.9;
     }
 
     .submit-btn {
-      background: green;
+      background: #000;
+      color: white;
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .submit-btn:hover {
+      background: #333;
     }
   </style>
 </head>
@@ -74,13 +88,12 @@
     <h2>Оставьте заявку</h2>
     <form id="form">
       <input type="text" id="name" placeholder="Ваше имя" required />
-
       <input type="tel" id="phone" placeholder="+7" value="+7" maxlength="12" required oninput="validatePhone(this)" />
 
       <div class="buttons">
-        <button type="button" onclick="selectService('Покупка вина')">Покупка вина</button>
-        <button type="button" onclick="selectService('Доставка')">Доставка</button>
-        <button type="button" onclick="selectService('Консультация')">Консультация</button>
+        <button type="button" class="btn-blue" onclick="selectService('Свободные руки')">Свободные руки</button>
+        <button type="button" class="btn-maroon" onclick="selectService('Персональная консультация')">Персональная консультация</button>
+        <button type="button" class="btn-green" onclick="selectService('Заказать дегустацию')">Заказать дегустацию</button>
       </div>
 
       <button class="submit-btn" type="submit">Отправить</button>
@@ -99,9 +112,8 @@
       if (!input.value.startsWith("+7")) {
         input.value = "+7";
       }
-      if (input.value === "+78") {
-        input.value = "+7";
-      }
+      const cleaned = input.value.replace(/[^\d+]/g, "");
+      input.value = cleaned.slice(0, 12);
     }
 
     document.getElementById("form").addEventListener("submit", function (e) {
@@ -123,7 +135,7 @@
 
       if (window.Telegram.WebApp) {
         Telegram.WebApp.sendData(JSON.stringify(data));
-        Telegram.WebApp.close(); // Закрытие WebApp после отправки
+        Telegram.WebApp.close();
       } else {
         alert("Ошибка: Telegram WebApp не найден");
       }

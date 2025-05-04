@@ -1,132 +1,129 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DRINX</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            padding: 20px;
-            max-width: 500px;
-            margin: 0 auto;
-            background: linear-gradient(to bottom right, #f8f5f0, #f1ebe4);
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            border-radius: 12px;
-        }
-        .logo {
-            display: block;
-            margin: 0 auto 20px;
-            max-width: 150px;
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 10px;
-            color: #4a2511;
-        }
-        .service-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 16px;
-            color: white;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .service-btn:hover {
-            opacity: 0.9;
-        }
-        .free-hands { background-color: #8b0000; }
-        .manager { background-color: #4a2511; }
-        .tasting { background-color: #5c3a21; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Оформить заявку</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fafafa;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
 
-        .active {
-            box-shadow: 0 0 0 3px rgba(0,0,0,0.3);
-            transform: scale(1.02);
-        }
-        input, button {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 15px;
-        }
-        input {
-            border: 1px solid #ccc;
-        }
-        button.submit {
-            background: #5c3a21;
-            color: white;
-            border: none;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-        button.submit:hover {
-            background: #7b5030;
-        }
-    </style>
+    .container {
+      max-width: 400px;
+      width: 100%;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+
+    img {
+      max-width: 100px;
+      margin: 0 auto 20px;
+      display: block;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      background: #800000;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #a00000;
+    }
+  </style>
 </head>
 <body>
-    <img src="logo.png" alt="Логотип" class="logo">
-    <h2>DRINX ВИНОТЕКА</h2>
+  <div class="container">
+    <img src="logo.png" alt="Логотип">
+    <h2>Заявка на заказ</h2>
+    <form id="orderForm">
+      <input type="text" id="name" placeholder="Ваше имя" required />
 
-    <h3>Выберите услугу:</h3>
-    <button class="service-btn free-hands" onclick="selectService('Свободные руки', this)">СВОБОДНЫЕ РУКИ</button>
-    <button class="service-btn manager" onclick="selectService('Персональный менеджер', this)">ПЕРСОНАЛЬНЫЙ МЕНЕДЖЕР</button>
-    <button class="service-btn tasting" onclick="selectService('Дегустация', this)">ДЕГУСТАЦИЯ</button>
+      <input
+        type="tel"
+        id="phone"
+        placeholder="+7 999 123-45-67"
+        pattern="^\+79\d{9}$"
+        maxlength="12"
+        required
+        value="+7"
+        oninput="validatePhone(this)"
+      />
 
-    <input type="text" id="name" placeholder="Ваше имя" required>
-    <input type="tel" id="phone" value="+7" placeholder="+7XXXXXXXXXX" required>
+      <select id="service_type" required>
+        <option value="" disabled selected>Выберите услугу</option>
+        <option value="Покупка вина">Покупка вина</option>
+        <option value="Доставка">Доставка</option>
+        <option value="Консультация">Консультация</option>
+      </select>
 
-    <button class="submit" onclick="submitForm()">ОТПРАВИТЬ ЗАЯВКУ</button>
+      <button type="submit">Отправить</button>
+    </form>
+  </div>
 
-    <script>
-        Telegram.WebApp.ready();
-        Telegram.WebApp.expand();
+  <script>
+    const form = document.getElementById('orderForm');
 
-        let selectedService = null;
+    function validatePhone(input) {
+      if (!input.value.startsWith('+7')) {
+        input.value = '+7';
+      }
+      // Автоудаление 8 после +7
+      if (input.value === '+78') {
+        input.value = '+7';
+      }
+    }
 
-        function selectService(service, button) {
-            document.querySelectorAll('.service-btn').forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            selectedService = service;
-        }
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const service = document.getElementById('service_type').value;
 
-        function submitForm() {
-            const name = document.getElementById('name').value.trim();
-            const phoneInput = document.getElementById('phone');
-            let phone = phoneInput.value.trim();
+      if (!name || !phone || !service) {
+        alert("Пожалуйста, заполните все поля.");
+        return;
+      }
 
-            // Убедимся, что номер начинается с +7 и за ним следует 10 цифр, первая из которых — 9
-            const phoneRegex = /^\+79\d{9}$/;
+      const data = {
+        name: name,
+        phone: phone,
+        service_type: service
+      };
 
-            if (!name || !selectedService || !phoneRegex.test(phone)) {
-                Telegram.WebApp.showAlert("Введите корректный номер телефона начиная с +79XXXXXXXXX и заполните все поля.");
-                return;
-            }
-
-            const data = {
-                name: name,
-                phone: phone,
-                service_type: selectedService
-            };
-
-            Telegram.WebApp.sendData(JSON.stringify(data));
-            Telegram.WebApp.close();
-        }
-
-        // Автоматически вставляем +7, если пользователь его стёр
-        document.getElementById('phone').addEventListener('input', function () {
-            if (!this.value.startsWith('+7')) {
-                this.value = '+7';
-            }
-        });
-    </script>
+      // Отправка данных в Telegram WebApp
+      if (window.Telegram.WebApp) {
+        Telegram.WebApp.sendData(JSON.stringify(data));
+        Telegram.WebApp.close();
+      } else {
+        alert("Ошибка: Telegram WebApp не найден");
+      }
+    });
+  </script>
 </body>
 </html>

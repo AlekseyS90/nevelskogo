@@ -3,25 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Оформить заявку</title>
+  <title>Заявка</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #fafafa;
-      color: #333;
+      background: #f2f2f2;
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
       padding: 20px;
     }
 
     .container {
-      max-width: 400px;
-      width: 100%;
-      background: white;
+      background: #fff;
       border-radius: 15px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       padding: 30px;
+      max-width: 400px;
+      width: 100%;
     }
 
     img {
@@ -35,91 +33,97 @@
       margin-bottom: 20px;
     }
 
-    input, select, button {
+    input {
       width: 100%;
       padding: 12px;
-      margin: 10px 0;
-      border-radius: 8px;
+      margin-bottom: 12px;
       border: 1px solid #ccc;
+      border-radius: 8px;
       font-size: 16px;
     }
 
-    button {
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .buttons button {
+      padding: 12px;
+      font-size: 16px;
       background: #800000;
       color: white;
       border: none;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s;
     }
 
-    button:hover {
+    .buttons button:hover {
       background: #a00000;
+    }
+
+    .submit-btn {
+      background: green;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <img src="logo.png" alt="Логотип">
-    <h2>Заявка на заказ</h2>
-    <form id="orderForm">
+    <h2>Оставьте заявку</h2>
+    <form id="form">
       <input type="text" id="name" placeholder="Ваше имя" required />
 
-      <input
-        type="tel"
-        id="phone"
-        placeholder="+7 999 123-45-67"
-        pattern="^\+79\d{9}$"
-        maxlength="12"
-        required
-        value="+7"
-        oninput="validatePhone(this)"
-      />
+      <input type="tel" id="phone" placeholder="+7" value="+7" maxlength="12" required oninput="validatePhone(this)" />
 
-      <select id="service_type" required>
-        <option value="" disabled selected>Выберите услугу</option>
-        <option value="Покупка вина">Покупка вина</option>
-        <option value="Доставка">Доставка</option>
-        <option value="Консультация">Консультация</option>
-      </select>
+      <div class="buttons">
+        <button type="button" onclick="selectService('Покупка вина')">Покупка вина</button>
+        <button type="button" onclick="selectService('Доставка')">Доставка</button>
+        <button type="button" onclick="selectService('Консультация')">Консультация</button>
+      </div>
 
-      <button type="submit">Отправить</button>
+      <button class="submit-btn" type="submit">Отправить</button>
     </form>
   </div>
 
   <script>
-    const form = document.getElementById('orderForm');
+    let selectedService = "";
+
+    function selectService(service) {
+      selectedService = service;
+      alert("Вы выбрали: " + service);
+    }
 
     function validatePhone(input) {
-      if (!input.value.startsWith('+7')) {
-        input.value = '+7';
+      if (!input.value.startsWith("+7")) {
+        input.value = "+7";
       }
-      // Автоудаление 8 после +7
-      if (input.value === '+78') {
-        input.value = '+7';
+      if (input.value === "+78") {
+        input.value = "+7";
       }
     }
 
-    form.addEventListener('submit', function (e) {
+    document.getElementById("form").addEventListener("submit", function (e) {
       e.preventDefault();
-      const name = document.getElementById('name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const service = document.getElementById('service_type').value;
 
-      if (!name || !phone || !service) {
-        alert("Пожалуйста, заполните все поля.");
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+
+      if (!selectedService) {
+        alert("Пожалуйста, выберите услугу.");
         return;
       }
 
       const data = {
         name: name,
         phone: phone,
-        service_type: service
+        service_type: selectedService
       };
 
-      // Отправка данных в Telegram WebApp
       if (window.Telegram.WebApp) {
         Telegram.WebApp.sendData(JSON.stringify(data));
-        Telegram.WebApp.close();
+        Telegram.WebApp.close(); // Закрытие WebApp после отправки
       } else {
         alert("Ошибка: Telegram WebApp не найден");
       }

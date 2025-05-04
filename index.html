@@ -82,7 +82,7 @@
     <button class="service-btn tasting" onclick="selectService('Дегустация', this)">ДЕГУСТАЦИЯ</button>
 
     <input type="text" id="name" placeholder="Ваше имя" required>
-    <input type="tel" id="phone" placeholder="+7XXXXXXXXXX" pattern="^\+7\d{10}$" required>
+    <input type="tel" id="phone" value="+7" placeholder="+7XXXXXXXXXX" required>
 
     <button class="submit" onclick="submitForm()">ОТПРАВИТЬ ЗАЯВКУ</button>
 
@@ -100,10 +100,14 @@
 
         function submitForm() {
             const name = document.getElementById('name').value.trim();
-            const phone = document.getElementById('phone').value.trim();
+            const phoneInput = document.getElementById('phone');
+            let phone = phoneInput.value.trim();
 
-            if (!name || !phone.match(/^\+7\d{10}$/) || !selectedService) {
-                Telegram.WebApp.showAlert("Пожалуйста, заполните все поля корректно.");
+            // Убедимся, что номер начинается с +7 и за ним следует 10 цифр, первая из которых — 9
+            const phoneRegex = /^\+79\d{9}$/;
+
+            if (!name || !selectedService || !phoneRegex.test(phone)) {
+                Telegram.WebApp.showAlert("Введите корректный номер телефона начиная с +79XXXXXXXXX и заполните все поля.");
                 return;
             }
 
@@ -116,6 +120,13 @@
             Telegram.WebApp.sendData(JSON.stringify(data));
             Telegram.WebApp.close();
         }
+
+        // Автоматически вставляем +7, если пользователь его стёр
+        document.getElementById('phone').addEventListener('input', function () {
+            if (!this.value.startsWith('+7')) {
+                this.value = '+7';
+            }
+        });
     </script>
 </body>
 </html>

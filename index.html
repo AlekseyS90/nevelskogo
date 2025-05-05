@@ -9,7 +9,7 @@
         body {
             font-family: 'Arial', sans-serif;
             padding: 20px;
-            background-color: #F5E9DC; /* Бежевый фон */
+            background-color: #EDD5BB; /* Более темный бежевый фон */
             margin: 0;
             min-height: 100vh;
             display: flex;
@@ -20,11 +20,11 @@
             max-width: 500px;
             width: 100%;
             margin: 0 auto;
-            background: #FFF9F0; /* Светло-бежевый */
+            background: #FFF5E6; /* Светло-бежевый */
             padding: 25px;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(139, 69, 19, 0.1); /* Коричневые тени */
-            border: 1px solid #D2B48C; /* Светло-коричневая рамка */
+            box-shadow: 0 4px 15px rgba(139, 69, 19, 0.2); /* Более выраженные тени */
+            border: 1px solid #C4A484; /* Более темная рамка */
         }
         .logo {
             display: block;
@@ -45,7 +45,7 @@
         input {
             width: 100%;
             padding: 12px 15px;
-            border: 1px solid #D2B48C;
+            border: 1px solid #C4A484;
             border-radius: 8px;
             box-sizing: border-box;
             font-size: 16px;
@@ -65,6 +65,7 @@
         }
         .service-btn {
             padding: 14px;
+            background: #A1887F; /* Единый цвет для всех кнопок */
             color: white;
             border: none;
             border-radius: 8px;
@@ -77,32 +78,17 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .service-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
         .service-btn.active {
+            background: #6D4C41; /* Темно-коричневый для активной кнопки */
             transform: translateY(0);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-        }
-        #hands-btn {
-            background: #A1887F; /* Светло-коричневый */
-        }
-        #hands-btn.active {
-            background: #8D6E63; /* Темнее */
-        }
-        #consult-btn {
-            background: #BCAAA4; /* Бежево-коричневый */
-        }
-        #consult-btn.active {
-            background: #A1887F; /* Темнее */
-        }
-        #degust-btn {
-            background: #8D6E63; /* Коричневый */
-        }
-        #degust-btn.active {
-            background: #6D4C41; /* Темнее */
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 0 2px #8D6E63; /* Контур для выделения */
+            border: 1px solid #5D4037;
         }
         .submit-btn {
             width: 100%;
@@ -117,11 +103,12 @@
             margin-top: 15px;
             transition: all 0.3s;
             text-transform: uppercase;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.16);
         }
         .submit-btn:hover {
             background: #3E2723;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
         }
         .section-title {
             text-align: center;
@@ -138,13 +125,13 @@
         
         <div class="section-title">Выберите услугу</div>
         <div class="service-buttons">
-            <button type="button" id="hands-btn" class="service-btn active" data-value="free_hands">
+            <button type="button" class="service-btn active" data-value="free_hands">
                 👐 Свободные руки
             </button>
-            <button type="button" id="consult-btn" class="service-btn" data-value="consultation">
+            <button type="button" class="service-btn" data-value="consultation">
                 😊 Консультация кависта
             </button>
-            <button type="button" id="degust-btn" class="service-btn" data-value="degustation">
+            <button type="button" class="service-btn" data-value="degustation">
                 🍷 Заказать дегустацию
             </button>
             <input type="hidden" id="service" name="service" value="free_hands">
